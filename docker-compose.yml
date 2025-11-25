@@ -1,0 +1,43 @@
+services:
+  kopia-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.kopia
+    hostname: kopia-server
+    container_name: kopia-server
+    cap_add:
+      - SYS_ADMIN
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Europe/London
+      - KOPIA_HTTPS=true
+      - KOPIA_UI_USERNAME=admin
+      - KOPIA_UI_PASSWORD=mysecretpassword
+      - KOPIA_PASSWORD=mysecretpassword
+      - REFRESH_INTERVAL=
+    volumes:
+      - ./config:/config
+      - ./backups:/backups
+      - ./kopia:/repository
+      - /tmp:/tmp:shared
+    devices:
+      - /dev/fuse:/dev/fuse:rwm
+    ports:
+      - 51515:51515
+    restart: unless-stopped
+
+  node-app:
+    build: .
+    container_name: node-app
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./js/index.js:/app/index.js
+    working_dir: /app
+    environment:
+      - UI_USER=admin
+      - UI_PASSWORD=mysecretpassword
+    ports:
+      - 8451:8451
+    restart: unless-stopped
+

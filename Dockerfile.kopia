@@ -1,0 +1,4 @@
+FROM ghcr.io/thespad/kopia-server:latest
+
+# Instala expect (Alpine)
+RUN apk add --no-cache expect
